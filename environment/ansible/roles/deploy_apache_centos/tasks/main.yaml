@@ -1,0 +1,56 @@
+---
+- name: Print Linux Family
+  debug: var=ansible_os_family
+
+- block:
+  - name: Installing Apache Web Server for RPM
+    yum: name=httpd state=latest
+        
+  - name:     Generate index.html from jinja2 template and then copy it to the remote host
+    template: src=index.j2 dest={{ dest_folder }}/index.html mode=0555
+    
+    
+  - name:     Copy the images
+    copy:     src={{ item }} dest={{ dest_folder }}/ mode=0555
+    
+    loop:
+      - "tulip.jpeg"
+      - "daisy.jpeg"
+      - "rose.jpeg"
+      - "daffodil.jpeg"
+      - "lilly.jpeg"
+      - "sunflower.jpeg"
+      - "hibiscus.jpeg"
+        
+        
+  - name: Starting Apache Web Server for RPM
+    service: name=httpd state=started enabled=yes
+    notify:   Restart Httpd
+
+  when: ansible_os_family == "RedHat"
+ 
+- block:
+  - name: Installing Apache Web Server for Debian
+    yum: name=apache2 state=latest
+        
+  - name:     Generate index.html from jinja2 template and copy to the remote host
+    template: src=index.j2 dest={{ dest_folder }}/index.html mode=0555
+    notify:   Restart Apache2
+    
+  - name:     Copy the images
+    copy:     src={{ item }} dest={{ dest_folder }}/ mode=0555
+    notify:   Restart Apache2
+    loop:
+      - "tulip.jpeg"
+      - "daisy.jpeg"
+      - "rose.jpeg"
+      - "daffodil.jpeg"
+      - "lilly.jpeg"
+      - "sunflower.jpeg"
+      - "hibiscus.jpeg"
+        
+        
+  - name: Starting Apache Web Server for Debian
+    service: name=apache2 state=started enabled=yes
+
+  when: ansible_os_family == "Debian"

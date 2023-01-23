@@ -1,0 +1,14 @@
+---
+- hosts: tag_ubuntu
+  gather_facts: True
+  become: yes
+  
+  roles:
+    - { role: deploy_apache_centos, when: ansible_system == 'Linux' }
+    
+- hosts: tag_linux
+  gather_facts: True
+  become: yes
+  
+  roles:
+    - { role: deploy_apache_centos, when: ansible_system == 'Linux' }
